@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	appinternal "github.com/oboGameDev/leaderboard/internal/App"
+	appinternal "github.com/oboGameDev/leaderboard/internal/applogic"
 	cfgpkg "github.com/oboGameDev/leaderboard/internal/config"
 	httpapi "github.com/oboGameDev/leaderboard/internal/httpserver"
 )

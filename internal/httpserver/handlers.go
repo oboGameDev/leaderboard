@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/oboGameDev/leaderboard/internal/app"
+	app "github.com/oboGameDev/leaderboard/internal/applogic"
 )
 
 type Handler struct {

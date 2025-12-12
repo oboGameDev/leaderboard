@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	cfgpkg "github.com/oboGameDev/leaderboard/internal/config"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -15,12 +16,7 @@ type LeaderboardService struct {
 	leagues []League
 }
 
-func NewLeaderboardService(rdb *redis.Client, yamlLeagues []struct {
-	ID    int
-	Min   int
-	Max   int
-	Names map[string]string
-}) *LeaderboardService {
+func NewLeaderboardService(rdb *redis.Client, yamlLeagues []cfgpkg.LeagueYAML) *LeaderboardService {
 	var leagues []League
 	for _, l := range yamlLeagues {
 		leagues = append(leagues, League{

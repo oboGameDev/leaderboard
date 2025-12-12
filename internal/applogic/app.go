@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	cfgpkg "github.com/oboGameDev/leaderboard/internal/config"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -13,16 +14,7 @@ type App struct {
 	Redis       *redis.Client
 }
 
-func NewAppFromConfig(cfg *struct {
-	RedisAddr string
-	HTTPAddr  string
-	Leagues   []struct {
-		ID    int
-		Min   int
-		Max   int
-		Names map[string]string
-	}
-}) (*App, error) {
+func NewAppFromConfig(cfg *cfgpkg.Config) (*App, error) {
 	rdb := redis.NewClient(&redis.Options{Addr: cfg.RedisAddr})
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
@@ -34,4 +26,12 @@ func NewAppFromConfig(cfg *struct {
 		Leaderboard: srv,
 		Redis:       rdb,
 	}, nil
+}
+
+func (a *App) GetLeagueLeaderboard(ctx context.Context, leagueID int, cursor string, limit int) ([]LeaderboardItem, string, error) {
+	return a.Leaderboard.GetLeagueLeaderboard(ctx, leagueID, cursor, limit)
+}
+
+func (a *App) GetUserRank(ctx context.Context, leagueID int, userID string) (int64, error) {
+	return a.Leaderboard.GetUserRank(ctx, leagueID, userID)
 }
