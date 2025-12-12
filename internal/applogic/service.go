@@ -183,5 +183,6 @@ func (s *LeaderboardService) GetLeagueLeaderboard(ctx context.Context, leagueID 
 		last := zs[len(zs)-1]
 		next = buildCursor(last.Score, fmt.Sprint(last.Member))
 	}
+
 	return items, next, nil
 }

@@ -19,8 +19,51 @@ func NewHandler(a *app.App) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/league/", h.handleLeague)
+	mux.HandleFunc("/user/", h.handleUser)
 
 	return mux
+}
+func (h *Handler) handleUser(w http.ResponseWriter, r *http.Request) {
+	parts := strings.Split(strings.TrimPrefix(r.URL.Path, "/user/"), "/")
+	if len(parts) < 2 {
+		http.Error(w, "bad path", http.StatusBadRequest)
+		return
+	}
+
+	userID := parts[0]
+	action := parts[1]
+
+	// /user/{id}/add?delta=100
+	if action == "add" {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method", http.StatusMethodNotAllowed)
+			return
+		}
+		q := r.URL.Query()
+		deltaStr := q.Get("delta")
+		delta, err := strconv.Atoi(deltaStr)
+		if err != nil {
+			http.Error(w, "bad delta", http.StatusBadRequest)
+			return
+		}
+
+		newPoints, league, err := h.app.AddUserPoints(context.Background(), userID, int64(delta))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		resp := map[string]interface{}{
+			"userId":    userID,
+			"newPoints": newPoints,
+			"newLeague": league,
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(resp)
+		return
+	}
+
+	http.Error(w, "not found", http.StatusNotFound)
 }
 
 func (h *Handler) handleLeague(w http.ResponseWriter, r *http.Request) {

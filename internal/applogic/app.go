@@ -15,7 +15,7 @@ type App struct {
 }
 
 func NewAppFromConfig(cfg *cfgpkg.Config) (*App, error) {
-	rdb := redis.NewClient(&redis.Options{Addr: cfg.RedisAddr})
+	rdb := redis.NewClient(&redis.Options{Addr: cfg.RedisAddr, DB: 0})
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	if err := rdb.Ping(ctx).Err(); err != nil {
@@ -34,4 +34,7 @@ func (a *App) GetLeagueLeaderboard(ctx context.Context, leagueID int, cursor str
 
 func (a *App) GetUserRank(ctx context.Context, leagueID int, userID string) (int64, error) {
 	return a.Leaderboard.GetUserRank(ctx, leagueID, userID)
+}
+func (a *App) AddUserPoints(ctx context.Context, userID string, delta int64) (int64, int, error) {
+	return a.Leaderboard.AddUserPoints(ctx, userID, delta)
 }
