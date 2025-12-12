@@ -32,12 +32,10 @@ func NewLeaderboardService(rdb *redis.Client, yamlLeagues []cfgpkg.LeagueYAML) *
 	}
 }
 
-// helper keys
 func leagueKey(id int) string            { return fmt.Sprintf("league:%d:lb", id) }
 func userPointsKey(userID string) string { return fmt.Sprintf("user:%s:points", userID) }
 func userLeagueKey(userID string) string { return fmt.Sprintf("user:%s:league", userID) }
 
-// Determine league by points using configured leagues
 func (s *LeaderboardService) determineLeague(points int) int {
 	for _, l := range s.leagues {
 		if l.Max == -1 {
@@ -54,9 +52,8 @@ func (s *LeaderboardService) determineLeague(points int) int {
 	return 0
 }
 
-// UpdateUserPoints updates points (delta can be negative) and moves user between leaderboards
 func (s *LeaderboardService) UpdateUserPoints(ctx context.Context, userID string, delta int64) (int64, int, error) {
-	// read current
+
 	curr, err := s.rdb.Get(ctx, userPointsKey(userID)).Int64()
 	if err != nil && err != redis.Nil {
 		return 0, 0, err
@@ -67,7 +64,6 @@ func (s *LeaderboardService) UpdateUserPoints(ctx context.Context, userID string
 	}
 	newLeague := s.determineLeague(int(newPoints))
 	oldLeague, _ := s.rdb.Get(ctx, userLeagueKey(userID)).Int()
-	// atomic-ish via pipeline
 	pipe := s.rdb.TxPipeline()
 	pipe.Set(ctx, userPointsKey(userID), newPoints, 0)
 	if oldLeague != 0 && oldLeague != newLeague {
@@ -109,7 +105,6 @@ func (s *LeaderboardService) GetUserRank(ctx context.Context, leagueID int, user
 	return rank + 1, nil
 }
 
-// Cursor helpers
 func parseCursor(c string) (float64, string, error) {
 	if c == "" {
 		return 0, "", nil
@@ -131,7 +126,6 @@ func buildCursor(score float64, userID string) string {
 	return fmt.Sprintf("%f:%s", score, userID)
 }
 
-// GetLeagueLeaderboard returns items and next cursor (empty if no more)
 func (s *LeaderboardService) GetLeagueLeaderboard(ctx context.Context, leagueID int, cursor string, limit int) ([]LeaderboardItem, string, error) {
 	if limit <= 0 {
 		return nil, "", errors.New("limit must be > 0")
