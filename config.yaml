@@ -1,24 +1,24 @@
 redis_addr: "localhost:6379"
 http_addr: ":8080"
 leagues:
-- id: 1
-min: 0
-max: 199
-names:
-en: "Bronze"
-ru: "Бронза"
-tm: "Bürünç"
-- id: 2
-min: 200
-max: 499
-names:
-en: "Silver"
-ru: "Серебро"
-tm: "Kümüş"
-- id: 3
-min: 500
-max: 899
-names:
-en: "Gold"
-ru: "Алтын"
-tm: "Altyn"
+  - id: 1
+    min: 0
+    max: 199
+    names:
+      en: "Bronze"
+      ru: "Бронза"
+      tm: "Bürünç"
+  - id: 2
+    min: 200
+    max: 499
+    names:
+      en: "Silver"
+      ru: "Серебро"
+      tm: "Kümüş"
+  - id: 3
+    min: 500
+    max: 899
+    names:
+      en: "Gold"
+      ru: "Алтын"
+      tm: "Altyn"
